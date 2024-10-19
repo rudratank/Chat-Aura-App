@@ -6,47 +6,87 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
 import apiClient from "@/lib/api-client";
-import { SIGNUP_ROUTE } from "@/utils/constants";
+import { SIGNUP_ROUTE,LOGIN_ROUTE } from "@/utils/constants";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
   const handleLogin = async () => {
-    
+    if (!email.length) {
+      toast.error("Email is required");
+      return false;
+    }
+    if (!password.length) {
+      toast.error("Password is required");
+      return false;
+    }
+  
+    const data = {
+      email: email.trim(),
+      password: password,
+    };
+  
+    setLoading(true);
+  
+    try {
+      const response = await axios.post(LOGIN_ROUTE, data, {
+        withCredentials: true,
+      });
+      console.log('Login Success:', response.data);
+      toast.success("Login successful!");
+      if (response.data.user.id) {
+        if (response.data.user.profileSetup) {
+          navigate("/chat");
+        } else {
+          navigate("/profile");
+        }
+      }
+    } catch (error) {
+      console.error('Login Error:', error.response ? error.response.data : error.message);
+      toast.error(error.response ? error.response.data : "Login failed!");
+    } finally {
+      setLoading(false);
+    }
   };
-
+  
   const handleSignup = async () => {
     if (password !== confirmPassword) {
-        toast.error("Passwords do not match!");
-        return;
+      toast.error("Passwords do not match!");
+      return;
     }
-
+  
     const data = {
-        email: email.trim(),
-        password: password, 
+      email: email.trim(),
+      password: password, 
     };
-
+  
     console.log('Signup Data:', data);
-
+  
     setLoading(true);
-
+  
     try {
-        const response = await axios.post(SIGNUP_ROUTE, data, {
-            withCredentials: true, 
-        });
-        console.log('Signup Success:', response.data);
-        toast.success("Signup successful!");
+      const response = await axios.post(SIGNUP_ROUTE, data, {
+        withCredentials: true, 
+      });
+      console.log('Signup Success:', response.data);
+      toast.success("Signup successful!");
+
+      if (response.status === 201) {
+        navigate("/profile");
+      }
     } catch (error) {
-        console.error('Signup Error:', error.response ? error.response.data : error.message);
-        toast.error(error.response ? error.response.data : "Signup failed!"); // Notify on error
+      console.error('Signup Error:', error.response ? error.response.data : error.message);
+      toast.error(error.response ? error.response.data : "Signup failed!");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
+  
 
 
   return (
@@ -60,7 +100,7 @@ const Auth = () => {
           </p>
         </div>
         <div className="flex flex-col items-center justify-center p-10 w-full">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" defaultValue="login">
             <TabsList className="mb-6 flex justify-center space-x-4">
               <TabsTrigger
                 value="login"
