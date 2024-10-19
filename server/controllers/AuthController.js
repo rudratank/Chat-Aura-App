@@ -1,35 +1,44 @@
-import user from "../models/UserModel.js";
-import jwt from "jsonwebtoken"
+import User from "../models/UserModel.js";
+import jwt from "jsonwebtoken";
 
 const maxAge = 3 * 24 * 60 * 60 * 1000; 
 
-const createToken = (email,userId) => {
-    return jwt.sign({email,userId},process.env.JWT_KEY,{ expiresIn:maxAge });
+const createToken = (email, userId) => {
+    return jwt.sign({ email, userId }, process.env.JWT_KEY, { expiresIn: maxAge });
 };
 
-export const signup =async(request,respose,next)=>{
-    try{
-        const {email,pasword}=req.body;
-        if(!email || !pasword){
-            return respose.status(400).send("Email and Password is required...")
+export const signup = async (request, response) => {
+    try {
+        const { email, password } = request.body;
+
+        if (!email || !password) {
+            return response.status(400).send("Email and Password are required...");
         }
-        
-        const user= await user.create({email,pasword})
-        respose.cookie("jwt",createToken(email,user.id),{
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return response.status(409).send("User already exists.");
+        }
+
+        const user = await User.create({ email, password });
+
+        // Set the JWT cookie
+        response.cookie("jwt", createToken(email, user._id), {
             maxAge,
-            secure:true,
-            sameSite:"None"
+            httpOnly: true,
+            secure: false, 
+            sameSite: "None" 
         });
 
-        return respose.status(201).json({
-            user:{
-            id:user.id,
-            email:user.email,
-            profileSetup:user.profileSetup,
-        },
-    });
-    }catch({error}){
-        console.log({error});
-        return respose.status(500).send("Internal Server Error");
+        return response.status(201).json({
+            user: {
+                id: user._id, 
+                email: user.email,
+                profileSetup: user.profileSetup,
+            },
+        });
+    } catch (error) {
+        console.log(error); 
+        return response.status(500).send("Internal Server Error");
     }
 };
