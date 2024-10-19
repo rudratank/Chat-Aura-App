@@ -1,13 +1,13 @@
 import user from "../models/UserModel.js";
-import {sign} from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 
 const maxAge = 3 * 24 * 60 * 60 * 1000; 
 
 const createToken = (email,userId) => {
-    return sign({email,userId},process.env.JWT_KEY,{ expiresIn:maxAge })
+    return jwt.sign({email,userId},process.env.JWT_KEY,{ expiresIn:maxAge });
 };
 
-export const singup =async(request,respose,next)=>{
+export const signup =async(request,respose,next)=>{
     try{
         const {email,pasword}=req.body;
         if(!email || !pasword){
@@ -32,4 +32,4 @@ export const singup =async(request,respose,next)=>{
         console.log({error});
         return respose.status(500).send("Internal Server Error");
     }
-}
+};
