@@ -6,16 +6,19 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
 import apiClient from "@/lib/api-client";
-import { SIGNUP_ROUTE,LOGIN_ROUTE } from "@/utils/constants";
+import { SIGNUP_ROUTE, LOGIN_ROUTE } from "@/utils/constants";
 import { useNavigate } from "react-router-dom";
+import { useAppStore } from "@/store";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { setUserInfo } = useAppStore(); // Properly invoke the useAppStore function
   const [activeTab, setActiveTab] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
   const handleLogin = async () => {
     if (!email.length) {
       toast.error("Email is required");
@@ -25,21 +28,23 @@ const Auth = () => {
       toast.error("Password is required");
       return false;
     }
-  
+
     const data = {
       email: email.trim(),
       password: password,
     };
-  
+
     setLoading(true);
-  
+
     try {
       const response = await axios.post(LOGIN_ROUTE, data, {
         withCredentials: true,
       });
       console.log('Login Success:', response.data);
       toast.success("Login successful!");
+      
       if (response.data.user.id) {
+        setUserInfo(response.data.user);
         if (response.data.user.profileSetup) {
           navigate("/chat");
         } else {
@@ -47,41 +52,42 @@ const Auth = () => {
         }
       }
     } catch (error) {
-      console.error('Login Error:', error.response ? error.response.data : error.message);
-      toast.error(error.response ? error.response.data : "Login failed!");
+      console.error('Login Error:', error.response?.data || error.message);
+      toast.error(error.response?.data || "Login failed!");
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleSignup = async () => {
     if (password !== confirmPassword) {
       toast.error("Passwords do not match!");
       return;
     }
-  
+
     const data = {
       email: email.trim(),
       password: password, 
     };
-  
+
     console.log('Signup Data:', data);
-  
+
     setLoading(true);
-  
+
     try {
       const response = await axios.post(SIGNUP_ROUTE, data, {
-        withCredentials: true, 
+        withCredentials: true,
       });
       console.log('Signup Success:', response.data);
       toast.success("Signup successful!");
 
       if (response.status === 201) {
         navigate("/profile");
+        setUserInfo(response.data.user);
       }
     } catch (error) {
-      console.error('Signup Error:', error.response ? error.response.data : error.message);
-      toast.error(error.response ? error.response.data : "Signup failed!");
+      console.error('Signup Error:', error.response?.data || error.message);
+      toast.error(error.response?.data || "Signup failed!");
     } finally {
       setLoading(false);
     }
