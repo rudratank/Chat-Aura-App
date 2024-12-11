@@ -16,7 +16,7 @@ const port = process.env.PORT   ||   5001
 const databaseurl=process.env.DATABASE_URL;
 
 app.use(cors({
-    origin:["http://localhost:5173"],
+    origin: ["https://chat-aura-app-frontend.onrender.com"],
     methods: ["GET", "POST","DELETE"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"]
