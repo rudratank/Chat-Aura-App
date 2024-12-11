@@ -30,12 +30,13 @@ export const signup = async (request, response) => {
         const user = await User.create({ email, password });
 
         response.cookie('jwt', createToken(email, user.id), {
-            maxAge,
-            httpOnly: true,
-            secure: false,  
-            sameSite: 'lax',
-            path: '/',       // Make the cookie available to all routes
-        });
+    maxAge,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/',
+});
+
 
         return response.status(201).json({
             user: {
@@ -66,13 +67,14 @@ export const login = async (request, response) => {
             return response.status(400).send('Invalid credentials');
         }
         
-        response.cookie('jwt', createToken(email, user.id), {
-            maxAge,
-            httpOnly: true,
-            secure: false,  
-            sameSite: 'lax',
-            path: '/',
-        });
+       response.cookie('jwt', createToken(email, user.id), {
+    maxAge,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/',
+});
+
         
         return response.status(200).json({
             user: {
