@@ -16,10 +16,13 @@ const port = process.env.PORT   ||   5001
 const databaseurl=process.env.DATABASE_URL;
 
 app.use(cors({
-    origin: ["https://chat-aura-app-frontend.onrender.com"],
-    methods: ["GET", "POST","DELETE"],
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"]
+  origin: [
+    "https://chat-aura-app-frontend.onrender.com",
+    "http://localhost:5173"
+  ],
+  methods: ["GET", "POST", "DELETE"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use("/uploads/profiles", express.static("uploads/profiles"));
