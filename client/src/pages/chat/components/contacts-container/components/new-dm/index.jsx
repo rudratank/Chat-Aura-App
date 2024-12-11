@@ -75,7 +75,7 @@ function NewDM() {
       </h3>
     </div>
   );
-const imageurl="http://localhost:8747"
+const imageurl="https://chat-aura-app-backend.onrender.com"
   return (
     <>
       <TooltipProvider>
