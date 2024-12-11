@@ -45,7 +45,7 @@ const Profile = () => {
     }
 
     if (userinfo.image) {
-      const uplodpath="http://localhost:8747";
+      const uplodpath="https://chat-aura-app-backend.onrender.com";
       setImage(`${uplodpath}/${userinfo.image}`);
       console.log(image);
     }
