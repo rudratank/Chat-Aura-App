@@ -24,7 +24,7 @@ function ProfileInfo() {
       console.log(error)
     }
   };
- const imageurl="http://localhost:8747"
+ const imageurl="https://chat-aura-app-backend.onrender.com"
   return (
     <div className="absolute bottom-0 h-16 flex items-center justify-between px-10 w-full bg-[#2a2b33]">
       <div className="flex items-center gap-2">
